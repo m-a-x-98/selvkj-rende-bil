@@ -131,15 +131,26 @@ int read_sensor(){
  
 void loop() {
 
-  for (int i = 60; i <= 130; i+5){
+  for (int i = 60; i <= 130; i= i+5){
       servoSenor.write(i);
-      Serial.println(i);
-      delay(10);
+      delay(25);
             distance = read_sensor();
                  distance = read_sensor();
-      if (distance < 30 or (lastDistance < 100 and distance > 500) ){
+      if (distance < 50 or (lastDistance < 100 and distance > 500) ){
         stopCar();
-        break;
+        int grad = 0;
+          for (int i = 60; i <= 130; i= i+5){
+             distance = read_sensor();
+   
+            if (distance < 50 or (lastDistance < 100 and distance > 500) ){
+              grad = i;
+              break;
+            }
+          }
+          if (grad >= 0 or grad <= 90){
+            turn_right();
+          }
+          Serial.println(grad);
       }
       else{
         forward();
@@ -147,14 +158,33 @@ void loop() {
         }
   }
   
-   for (int i = 130; i != 60; i = i-5){
-      servoSenor.write(i);
-      Serial.println(i);
-        delay(10);
-     distance = read_sensor();
-      if (distance < 30 or (lastDistance < 100 and distance > 500) ){
+   for (int i = 130; i >= 60; i = i-5){
+servoSenor.write(i);
+      delay(25);
+            distance = read_sensor();
+                 distance = read_sensor();
+      if (distance < 50 or (lastDistance < 100 and distance > 500) ){
         stopCar();
-        break;
+        int grad = 0;
+        int gradDistance = 0;
+        for (int i = 60; i <= 130; i= i+5){
+             distance = read_sensor();
+   
+            if (distance < 50 or (lastDistance < 100 and distance > 500) ){
+              if (gradDistance < distance){
+                              grad = i;
+              gradDistance = distance;
+              }
+
+            }
+          }
+          if (grad >= 0 and grad <= 90){
+            turn_right();
+          }
+                    if (grad >= 90  and grad <= 180){
+            turn_left();
+          }
+          Serial.println(grad);
       }
       else{
         forward();
