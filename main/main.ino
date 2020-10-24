@@ -108,20 +108,7 @@ void breakdance() {
     i += 1;
   }
 }
- 
-void loop() {
-
-  for (int i = 10; i <= 170; i++){
-      servoSenor.write(i);
-      Serial.println(i);
-      delay(10);
-  }
-   for (int i = 170; i != 10; i = i-1){
-      servoSenor.write(i);
-      Serial.println(i);
-      delay(10);
-  }
-  
+int read_sensor(){
   digitalWrite(4, HIGH);
   digitalWrite(5, LOW);
   // Clears the trigPin condition
@@ -137,13 +124,28 @@ void loop() {
   distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
   // Displays the distance on the Serial Monitor
   Serial.print("Distance: ");
-    Serial.print(distance);
+  Serial.print(distance);
   Serial.println(" cm");
-  if (distance < 30 or (lastDistance < 100 and distance > 1500) ){
-    stopCar();
+  return distance;
+}
+ 
+void loop() {
+
+  for (int i = 10; i <= 170; i++){
+      servoSenor.write(i);
+      Serial.println(i);
   }
-  else{
-    forward();
-     lastDistance = distance;
+   for (int i = 170; i != 10; i = i-1){
+      servoSenor.write(i);
+      Serial.println(i);
+      delay(10);
+  }
+        if (distance < 30 or (lastDistance < 100 and distance > 1500) ){
+        stopCar();
+      }
+      else{
+        forward();
+         lastDistance = distance;
+      delay(10);
   }
 }
