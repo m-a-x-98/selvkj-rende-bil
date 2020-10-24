@@ -29,7 +29,7 @@ void setup() {
 
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
-  
+
   analogWrite(enA, 200);
   analogWrite(enB, 200);
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
@@ -69,7 +69,7 @@ void backward() {
 }
 
 void stopCar(){
-    digitalWrite(in_A_1, LOW);
+  digitalWrite(in_A_1, LOW);
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, LOW);
@@ -128,68 +128,66 @@ int read_sensor(){
   Serial.println(" cm");
   return distance;
 }
- 
+
 void loop() {
-
+  int best_distance = 0;
   for (int i = 60; i <= 130; i= i+5){
-      servoSenor.write(i);
-      delay(25);
-            distance = read_sensor();
-                 distance = read_sensor();
-      if (distance < 50 or (lastDistance < 100 and distance > 500) ){
-        stopCar();
-        int grad = 0;
-          for (int i = 60; i <= 130; i= i+5){
-             distance = read_sensor();
-   
-            if (distance < 50 or (lastDistance < 100 and distance > 500) ){
-              grad = i;
-              break;
-            }
-          }
-          if (grad >= 0 or grad <= 90){
-            turn_right();
-          }
-          Serial.println(grad);
-      }
-      else{
-        forward();
-        lastDistance = distance;
+    servoSenor.write(i);
+    delay(25);
+    distance = read_sensor();
+    distance = read_sensor();
+    if (distance < 50 or (lastDistance < 100 and distance > 500) ){
+      stopCar();
+        for (int i = 10; i <= 170; i= i+5){
+        distance = read_sensor();
+        servoSenor.write(i);
+        distance = read_sensor();
+        if (distance > best_distance){
+          best_distance = distance;
         }
+        }
+      }
+      if (best_distance < 90){
+        turn_left();
+      }
+      else if (best_distance > 90){
+        turn_right();
+      }
+    else{
+      forward();
+      lastDistance = distance;
+    }
   }
-  
-   for (int i = 130; i >= 60; i = i-5){
-servoSenor.write(i);
-      delay(25);
-            distance = read_sensor();
-                 distance = read_sensor();
-      if (distance < 50 or (lastDistance < 100 and distance > 500) ){
-        stopCar();
-        int grad = 0;
-        int gradDistance = 0;
-        for (int i = 60; i <= 130; i= i+5){
-             distance = read_sensor();
-   
-            if (distance < 50 or (lastDistance < 100 and distance > 500) ){
-              if (gradDistance < distance){
-                              grad = i;
-              gradDistance = distance;
-              }
 
-            }
-          }
-          if (grad >= 0 and grad <= 90){
-            turn_right();
-          }
-                    if (grad >= 90  and grad <= 180){
-            turn_left();
-          }
-          Serial.println(grad);
+for (int i = 130; i >= 60; i = i-5){
+  servoSenor.write(i);
+  delay(25);
+  distance = read_sensor();
+  distance = read_sensor();
+  if (distance < 50 or (lastDistance < 100 and distance > 500) ){
+    stopCar();
+    int grad = 0;
+    int gradDistance = 0;
+    for (int i = 170; i >= 170; i= i-5){
+      distance = read_sensor();
+      servoSenor.write(i);
+      distance = read_sensor();
+      if (distance > best_distance){
+        best_distance = distance;
       }
-      else{
-        forward();
-        lastDistance = distance;
-        }
+    }
   }
+  if (best_distance < 90){
+    turn_left();
+  }
+  else if (best_distance > 90){
+    turn_right();
+  }
+  else{
+    forward();
+    lastDistance = distance;
+  }
+}
 
 }
+
