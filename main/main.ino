@@ -1,3 +1,8 @@
+#include <Servo.h>
+
+
+Servo servoSenor;
+
 int enA = 13;
 int in_A_1 = 12;
 int in_A_2 = 11;
@@ -9,8 +14,11 @@ int in_B_3 = 9;
 int in_B_4 = 8;
 long duration; // variable for the duration of sound wave travel
 int distance; // variable for the distance measurement
+int lastDistance;
 
 void setup() {
+  servoSenor.attach(5);
+  servoSenor.write(0);
   Serial.print("Hello");
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
@@ -18,6 +26,10 @@ void setup() {
   pinMode(in_A_2, OUTPUT);
   pinMode(in_B_3, OUTPUT);
   pinMode(in_B_4, OUTPUT);
+
+  pinMode(5, OUTPUT);
+  pinMode(4, OUTPUT);
+  
   analogWrite(enA, 200);
   analogWrite(enB, 200);
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
@@ -98,6 +110,20 @@ void breakdance() {
 }
  
 void loop() {
+
+  for (int i = 10; i <= 170; i++){
+      servoSenor.write(i);
+      Serial.println(i);
+      delay(10);
+  }
+   for (int i = 170; i != 10; i = i-1){
+      servoSenor.write(i);
+      Serial.println(i);
+      delay(10);
+  }
+  
+  digitalWrite(4, HIGH);
+  digitalWrite(5, LOW);
   // Clears the trigPin condition
   digitalWrite(trigPin, LOW);
   delay(.002);
@@ -113,10 +139,11 @@ void loop() {
   Serial.print("Distance: ");
     Serial.print(distance);
   Serial.println(" cm");
-  if (distance < 30){
+  if (distance < 30 or (lastDistance < 100 and distance > 1500) ){
     stopCar();
   }
   else{
     forward();
+     lastDistance = distance;
   }
 }
