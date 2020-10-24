@@ -47,11 +47,20 @@ void forward() {
   digitalWrite(in_B_4, LOW);
   delay(500);
 }
+
 void backward() {
   digitalWrite(in_A_1, HIGH);
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, HIGH);
+  delay(500);
+}
+
+void stopCar(){
+    digitalWrite(in_A_1, LOW);
+  digitalWrite(in_A_2, LOW);
+  digitalWrite(in_B_3, LOW);
+  digitalWrite(in_B_4, LOW);
   delay(500);
 }
 void breakdance() {
@@ -104,10 +113,8 @@ void loop() {
   Serial.print("Distance: ");
     Serial.print(distance);
   Serial.println(" cm");
-  if (distance < 20){
-    backward();
-    delay(75);
-    turn_left();
+  if (distance < 30){
+    stopCar();
   }
   else{
     forward();
