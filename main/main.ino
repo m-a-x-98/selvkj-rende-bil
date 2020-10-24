@@ -57,7 +57,7 @@ void forward() {
   digitalWrite(in_A_2, HIGH);
   digitalWrite(in_B_3, HIGH);
   digitalWrite(in_B_4, LOW);
-  delay(500);
+  delay(50);
 }
 
 void backward() {
@@ -113,10 +113,10 @@ int read_sensor(){
   digitalWrite(5, LOW);
   // Clears the trigPin condition
   digitalWrite(trigPin, LOW);
-  delay(.002);
+  delayMicroseconds(2);
   // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
   digitalWrite(trigPin, HIGH);
-  delay(.01);
+  delayMicroseconds(1);
   digitalWrite(trigPin, LOW);
   // Reads the echoPin, returns the sound wave travel time in microseconds
   duration = pulseIn(echoPin, HIGH);
@@ -131,21 +131,35 @@ int read_sensor(){
  
 void loop() {
 
-  for (int i = 10; i <= 170; i++){
-      servoSenor.write(i);
-      Serial.println(i);
-  }
-   for (int i = 170; i != 10; i = i-1){
+  for (int i = 60; i <= 130; i++){
       servoSenor.write(i);
       Serial.println(i);
       delay(10);
-  }
-        if (distance < 30 or (lastDistance < 100 and distance > 1500) ){
+            distance = read_sensor();
+                 distance = read_sensor();
+      if (distance < 30 or (lastDistance < 100 and distance > 500) ){
         stopCar();
+        break;
       }
       else{
         forward();
-         lastDistance = distance;
-      delay(10);
+        lastDistance = distance;
+        }
   }
+  
+   for (int i = 130; i != 60; i = i-1){
+      servoSenor.write(i);
+      Serial.println(i);
+        delay(10);
+     distance = read_sensor();
+      if (distance < 30 or (lastDistance < 100 and distance > 500) ){
+        stopCar();
+        break;
+      }
+      else{
+        forward();
+        lastDistance = distance;
+        }
+  }
+
 }
