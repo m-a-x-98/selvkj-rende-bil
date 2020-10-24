@@ -131,7 +131,7 @@ int read_sensor(){
  
 void loop() {
 
-  for (int i = 60; i <= 130; i++){
+  for (int i = 60; i <= 130; i+5){
       servoSenor.write(i);
       Serial.println(i);
       delay(10);
@@ -147,7 +147,7 @@ void loop() {
         }
   }
   
-   for (int i = 130; i != 60; i = i-1){
+   for (int i = 130; i != 60; i = i-5){
       servoSenor.write(i);
       Serial.println(i);
         delay(10);
