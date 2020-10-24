@@ -68,7 +68,7 @@ void backward() {
   delay(500);
 }
 
-void stopCar(){
+void stopCar() {
   digitalWrite(in_A_1, LOW);
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, LOW);
@@ -79,12 +79,12 @@ void breakdance() {
   int i = 0;
   analogWrite(enA, 255);
   analogWrite(enB, 255);
-  while (i != 5){
+  while (i != 5) {
     digitalWrite(in_A_1, HIGH);
     digitalWrite(in_A_2, LOW);
     digitalWrite(in_B_3, HIGH);
     digitalWrite(in_B_4, LOW);
-    delay(200);  
+    delay(200);
     digitalWrite(in_A_1, LOW);
     digitalWrite(in_A_2, HIGH);
     digitalWrite(in_B_3, LOW);
@@ -108,7 +108,7 @@ void breakdance() {
     i += 1;
   }
 }
-int read_sensor(){
+int read_sensor() {
   digitalWrite(4, HIGH);
   digitalWrite(5, LOW);
   // Clears the trigPin condition
@@ -131,63 +131,64 @@ int read_sensor(){
 
 void loop() {
   int best_distance = 0;
-  for (int i = 60; i <= 130; i= i+5){
+  for (int i = 60; i <= 130; i = i + 5) {
+    int grad = 0;
     servoSenor.write(i);
     delay(25);
     distance = read_sensor();
     distance = read_sensor();
-    if (distance < 50 or (lastDistance < 100 and distance > 500) ){
+    if (distance < 50 or (lastDistance < 100 and distance > 500) ) {
       stopCar();
-        for (int i = 10; i <= 170; i= i+5){
+      for (int i = 10; i <= 170; i = i + 5) {
+       distance = read_sensor();
+        servoSenor.write(i);
+        distance = read_sensor();
+        if (distance > best_distance) {
+          grad = i;
+          best_distance = distance;
+        }
+      }
+    }
+    if (grad < 90) {
+      turn_left();
+    }
+    else if (grad > 90) {
+      turn_right();
+    }
+    else {
+      forward();
+      lastDistance = distance;
+    }
+}
+
+  for (int i = 130; i >= 60; i = i - 5) {
+    int grad = 0;
+    servoSenor.write(i);
+    delay(25);
+    distance = read_sensor();
+    distance = read_sensor();
+    if (distance < 50 or (lastDistance < 100 and distance > 500) ) {
+      stopCar();
+      for (int i = 170; i >= 170; i = i - 5) {
         distance = read_sensor();
         servoSenor.write(i);
         distance = read_sensor();
-        if (distance > best_distance){
+        if (distance > best_distance) {
+          grad = i;
           best_distance = distance;
         }
-        }
       }
-      if (best_distance < 90){
-        turn_left();
-      }
-      else if (best_distance > 90){
-        turn_right();
-      }
-    else{
+    }
+    if (grad < 90) {
+      turn_left();
+    }
+    else if (grad > 90) {
+      turn_right();
+    }
+    else {
       forward();
       lastDistance = distance;
     }
   }
 
-for (int i = 130; i >= 60; i = i-5){
-  servoSenor.write(i);
-  delay(25);
-  distance = read_sensor();
-  distance = read_sensor();
-  if (distance < 50 or (lastDistance < 100 and distance > 500) ){
-    stopCar();
-    int grad = 0;
-    int gradDistance = 0;
-    for (int i = 170; i >= 170; i= i-5){
-      distance = read_sensor();
-      servoSenor.write(i);
-      distance = read_sensor();
-      if (distance > best_distance){
-        best_distance = distance;
-      }
-    }
-  }
-  if (best_distance < 90){
-    turn_left();
-  }
-  else if (best_distance > 90){
-    turn_right();
-  }
-  else{
-    forward();
-    lastDistance = distance;
-  }
 }
-
-}
-
