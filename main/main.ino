@@ -30,34 +30,35 @@ void setup() {
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
 
-  analogWrite(enA, 200);
-  analogWrite(enB, 200);
+  analogWrite(enA, 1023);
+  analogWrite(enB, 1023);
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
   pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
   Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
   Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
   Serial.println("with Arduino UNO R3");
 }
-void turn_left() {
+void turn_left(int forHowLong) {
   digitalWrite(in_A_1, HIGH);
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, HIGH);
   digitalWrite(in_B_4, LOW);
-  delay(300);
+  delay(forHowLong);
+  stopCar();
 }
-void turn_right() {
+void turn_right(int forHowLong) {
   digitalWrite(in_A_1, LOW);
   digitalWrite(in_A_2, HIGH);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, HIGH);
-  delay(300);
+  delay(forHowLong);
+  stopCar();
 }
 void forward() {
   digitalWrite(in_A_1, LOW);
   digitalWrite(in_A_2, HIGH);
   digitalWrite(in_B_3, HIGH);
   digitalWrite(in_B_4, LOW);
-  delay(50);
 }
 
 void backward() {
@@ -65,7 +66,6 @@ void backward() {
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, HIGH);
-  delay(500);
 }
 
 void stopCar() {
@@ -73,7 +73,7 @@ void stopCar() {
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, LOW);
-  delay(500);
+
 }
 void breakdance() {
   int i = 0;
@@ -129,66 +129,38 @@ int read_sensor() {
   return distance;
 }
 
-void loop() {
-  int best_distance = 0;
-  for (int i = 60; i <= 130; i = i + 5) {
-    int grad = 0;
-    servoSenor.write(i);
-    delay(25);
-    distance = read_sensor();
-    distance = read_sensor();
-    if (distance < 50 or (lastDistance < 100 and distance > 500) ) {
-      stopCar();
-      for (int i = 10; i <= 170; i = i + 5) {
-       distance = read_sensor();
-        servoSenor.write(i);
-        distance = read_sensor();
-        if (distance > best_distance) {
-          grad = i;
-          best_distance = distance;
-        }
-      }
-    }
-    if (grad < 90) {
-      turn_left();
-    }
-    else if (grad > 90) {
-      turn_right();
-    }
-    else {
-      forward();
-      lastDistance = distance;
-    }
+bool object(int grad){
+  servoSenor.write(grad);
+  distance = read_sensor();
+  if (distance <= 50){
+    return true;
+  }
+  return false;
 }
-
-  for (int i = 130; i >= 60; i = i - 5) {
-    int grad = 0;
-    servoSenor.write(i);
-    delay(25);
-    distance = read_sensor();
-    distance = read_sensor();
-    if (distance < 50 or (lastDistance < 100 and distance > 500) ) {
-      stopCar();
-      for (int i = 170; i >= 170; i = i - 5) {
-        distance = read_sensor();
-        servoSenor.write(i);
-        distance = read_sensor();
-        if (distance > best_distance) {
-          grad = i;
-          best_distance = distance;
-        }
+void moveTroughSensor (int start, int limit, int changer, int delayTime, bool downwards) {
+  distance = read_sensor();
+  if (downwards) {
+    for (int i = start; i >= limit; i += changer) {
+      if (i != start) {
+        delay(delayTime);
+      }
+      if (object(i)){
+        Serial.println(true);
       }
     }
-    if (grad < 90) {
-      turn_left();
-    }
-    else if (grad > 90) {
-      turn_right();
-    }
-    else {
-      forward();
-      lastDistance = distance;
+  } else {
+    for (int i = start; i <= limit; i += changer) {
+      if (i != start) {
+        delay(delayTime);
+      }
+      servoSenor.write(i);
     }
   }
+}
+void loop() {
+  int delayOnLoops = 125;
+  moveTroughSensor(60, 130, 5, delayOnLoops, false);
+  moveTroughSensor(130, 60, -5, delayOnLoops, true);
+  turn_right(1000);
 
 }
