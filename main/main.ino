@@ -129,23 +129,29 @@ int read_sensor() {
   return distance;
 }
 
-bool object(int grad){
+bool object(int grad) {
   servoSenor.write(grad);
   distance = read_sensor();
-  if (distance <= 50){
+  if (distance <= 50) {
     return true;
   }
   return false;
 }
-void moveTroughSensor (int start, int limit, int changer, int delayTime, bool downwards) {
+int *moveTroughSensor (int start, int limit, int changer, int delayTime, bool downwards) {
   distance = read_sensor();
+  int objectsGrad[10];
+  int tempObjectsGrad[1];
+
   if (downwards) {
     for (int i = start; i >= limit; i += changer) {
+      // Gjør at ting ser bedre ut ved å ikke ha delay på den første runden, det gjør at motoren ikke stopper men bare fortsetter
       if (i != start) {
         delay(delayTime);
       }
-      if (object(i)){
-        Serial.println(true);
+      if (object(i)) {
+        if (not ((sizeof(objectsGrad) / sizeof(objectsGrad[0])) > 10)) {
+          objectsGrad = tempObjectsGrad;
+        }
       }
     }
   } else {
@@ -153,12 +159,20 @@ void moveTroughSensor (int start, int limit, int changer, int delayTime, bool do
       if (i != start) {
         delay(delayTime);
       }
-      servoSenor.write(i);
+      if (object(i)) {
+        if (not ((sizeof(objectsGrad) / sizeof(objectsGrad[0])) > 10)) {
+          objectsGrad[sizeof(objectsGrad) / sizeof(objectsGrad[0])] = i;
+        }
+      }
     }
   }
+  return objectsGrad;
 }
+
 void loop() {
+  // https://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
   int delayOnLoops = 125;
+  int objects[] = {};
   moveTroughSensor(60, 130, 5, delayOnLoops, false);
   moveTroughSensor(130, 60, -5, delayOnLoops, true);
   turn_right(1000);
