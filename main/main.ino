@@ -137,10 +137,11 @@ bool object(int grad) {
   }
   return false;
 }
-int *moveTroughSensor (int start, int limit, int changer, int delayTime, bool downwards) {
+
+int findBestSolution (int start, int limit, int changer, int delayTime, bool downwards) {
   distance = read_sensor();
-  int objectsGrad[10];
-  int tempObjectsGrad[1];
+  int ledigGrader[30];
+  int ledigGraderDistance[30];
 
   if (downwards) {
     for (int i = start; i >= limit; i += changer) {
@@ -148,10 +149,9 @@ int *moveTroughSensor (int start, int limit, int changer, int delayTime, bool do
       if (i != start) {
         delay(delayTime);
       }
-      if (object(i)) {
-        if (not ((sizeof(objectsGrad) / sizeof(objectsGrad[0])) > 10)) {
-          objectsGrad = tempObjectsGrad;
-        }
+      if (not object(i)) {
+        ledigGraderDistance[sizeof(ledigGrader) / sizeof(ledigGrader[0])] = read_sensor();
+        ledigGrader[sizeof(ledigGrader) / sizeof(ledigGrader[0])] = i;
       }
     }
   } else {
@@ -160,21 +160,27 @@ int *moveTroughSensor (int start, int limit, int changer, int delayTime, bool do
         delay(delayTime);
       }
       if (object(i)) {
-        if (not ((sizeof(objectsGrad) / sizeof(objectsGrad[0])) > 10)) {
-          objectsGrad[sizeof(objectsGrad) / sizeof(objectsGrad[0])] = i;
-        }
+        ledigGrader[sizeof(ledigGrader) / sizeof(ledigGrader[0])] = i;
+
       }
     }
   }
-  return objectsGrad;
+  //TODO set objectsGrad to the best solution
+  int bestLedigGrad = ledigGrader[0];
+  int bestLedigGradDistance = 0;
+  for (int i = 0; i <= sizeof(ledigGrader) / sizeof(ledigGrader[0]); i++){
+    int denneDistance = ledigGraderDistance[i];
+    if (denneDistance > bestLedigGradDistance){
+      bestLedigGrad = ledigGrader[i];
+      bestLedigGradDistance = denneDistance;
+    }
+  }
+  return bestLedigGrad;
 }
-
 void loop() {
   // https://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
   int delayOnLoops = 125;
-  int objects[] = {};
-  moveTroughSensor(60, 130, 5, delayOnLoops, false);
-  moveTroughSensor(130, 60, -5, delayOnLoops, true);
+  int solution = findBestSolution(60, 130, 5, delayOnLoops, false);
   turn_right(1000);
 
 }
