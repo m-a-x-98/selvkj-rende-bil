@@ -8,7 +8,6 @@ int in_A_1 = 12;
 int in_A_2 = 11;
 int trigPin = 6;
 int echoPin = 7;
-
 int enB = 10;
 int in_B_3 = 9;
 int in_B_4 = 8;
