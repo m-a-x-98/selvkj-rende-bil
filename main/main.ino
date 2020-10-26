@@ -108,6 +108,18 @@ void breakdance() {
     i += 1;
   }
 }
+
+void turnDegrees(int degree) {
+  servoSenor.write(degree);
+  Serial.println(degree);
+
+  if (degree > 90){
+    turn_left(degree *10);
+  }else{
+    turn_right(degree * 50);
+  }
+  // TODO
+}
 int read_sensor() {
   digitalWrite(4, HIGH);
   digitalWrite(5, LOW);
@@ -138,10 +150,19 @@ bool object(int grad) {
   return false;
 }
 
+bool objectCurrent(){
+  distance = read_sensor();
+  Serial.println(distance <= 50);
+  if (distance <= 50){
+    return true;
+  }
+  return false;
+}
+
 int findBestSolution (int start, int limit, int changer, int delayTime, bool downwards) {
   distance = read_sensor();
-  int ledigGrader[30];
-  int ledigGraderDistance[30];
+  int besteGRAD = 0;
+  int besteDISTANCE = 0;
 
   if (downwards) {
     for (int i = start; i >= limit; i += changer) {
@@ -150,8 +171,13 @@ int findBestSolution (int start, int limit, int changer, int delayTime, bool dow
         delay(delayTime);
       }
       if (not object(i)) {
-        ledigGraderDistance[sizeof(ledigGrader) / sizeof(ledigGrader[0])] = read_sensor();
-        ledigGrader[sizeof(ledigGrader) / sizeof(ledigGrader[0])] = i;
+        if (besteDISTANCE < read_sensor()){
+          besteDISTANCE = read_sensor();
+          besteGRAD = i;
+          Serial.println(besteGRAD);
+          Serial.println(besteDISTANCE);
+        }
+
       }
     }
   } else {
@@ -159,28 +185,29 @@ int findBestSolution (int start, int limit, int changer, int delayTime, bool dow
       if (i != start) {
         delay(delayTime);
       }
-      if (object(i)) {
-        ledigGrader[sizeof(ledigGrader) / sizeof(ledigGrader[0])] = i;
+      if (not object(i)) {
+        if (besteDISTANCE < read_sensor()){
+          besteDISTANCE = read_sensor();
+          besteGRAD = i;
+          Serial.println(besteGRAD);
+          Serial.println(besteDISTANCE);
+        }
 
       }
     }
   }
-  //TODO set objectsGrad to the best solution
-  int bestLedigGrad = ledigGrader[0];
-  int bestLedigGradDistance = 0;
-  for (int i = 0; i <= sizeof(ledigGrader) / sizeof(ledigGrader[0]); i++){
-    int denneDistance = ledigGraderDistance[i];
-    if (denneDistance > bestLedigGradDistance){
-      bestLedigGrad = ledigGrader[i];
-      bestLedigGradDistance = denneDistance;
-    }
-  }
-  return bestLedigGrad;
+  return besteGRAD;
 }
 void loop() {
   // https://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
   int delayOnLoops = 125;
-  int solution = findBestSolution(60, 130, 5, delayOnLoops, false);
-  turn_right(1000);
+  if (object(90)){
+    stopCar();
+      int solution = findBestSolution(60, 130, 5, delayOnLoops, false);
+        turnDegrees(solution);
+  }else{
+    Serial.println(false);
+    forward();
+  }
 
 }
