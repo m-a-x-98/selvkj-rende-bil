@@ -8,7 +8,6 @@ int in_A_1 = 12;
 int in_A_2 = 11;
 int trigPin = 6;
 int echoPin = 7;
-
 int enB = 10;
 int in_B_3 = 9;
 int in_B_4 = 8;
@@ -16,10 +15,11 @@ long duration; // variable for the duration of sound wave travel
 int distance; // variable for the distance measurement
 int lastDistance;
 
+int thresHold = 25;
+
 void setup() {
   servoSenor.attach(5);
   servoSenor.write(0);
-  Serial.print("Hello");
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
   pinMode(in_A_1, OUTPUT);
@@ -30,34 +30,36 @@ void setup() {
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
 
-  analogWrite(enA, 200);
-  analogWrite(enB, 200);
+  analogWrite(enA, 225);
+  analogWrite(enB, 225);
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
   pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
   Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
+  Serial.println("Hello, running: V.0.93");
   Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
   Serial.println("with Arduino UNO R3");
 }
-void turn_left() {
+void turn_left(int forHowLong) {
   digitalWrite(in_A_1, HIGH);
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, HIGH);
   digitalWrite(in_B_4, LOW);
-  delay(300);
+  delay(forHowLong);
+  stopCar();
 }
-void turn_right() {
+void turn_right(int forHowLong) {
   digitalWrite(in_A_1, LOW);
   digitalWrite(in_A_2, HIGH);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, HIGH);
-  delay(300);
+  delay(forHowLong);
+  stopCar();
 }
 void forward() {
   digitalWrite(in_A_1, LOW);
   digitalWrite(in_A_2, HIGH);
   digitalWrite(in_B_3, HIGH);
   digitalWrite(in_B_4, LOW);
-  delay(50);
 }
 
 void backward() {
@@ -65,7 +67,6 @@ void backward() {
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, HIGH);
-  delay(500);
 }
 
 void stopCar() {
@@ -73,8 +74,9 @@ void stopCar() {
   digitalWrite(in_A_2, LOW);
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, LOW);
-  delay(500);
+
 }
+
 void breakdance() {
   int i = 0;
   analogWrite(enA, 255);
@@ -108,6 +110,18 @@ void breakdance() {
     i += 1;
   }
 }
+
+void turnDegrees(int degree) {
+  servoSenor.write(degree);
+  Serial.println(degree);
+
+  if (degree > 90) {
+    turn_left((90 + degree) * 3.3);
+  } else {
+    turn_right((90 - degree) * 3.3);
+  }
+  // TODO
+}
 int read_sensor() {
   digitalWrite(4, HIGH);
   digitalWrite(5, LOW);
@@ -129,66 +143,73 @@ int read_sensor() {
   return distance;
 }
 
-void loop() {
-  int best_distance = 0;
-  for (int i = 60; i <= 130; i = i + 5) {
-    int grad = 0;
-    servoSenor.write(i);
-    delay(25);
-    distance = read_sensor();
-    distance = read_sensor();
-    if (distance < 50 or (lastDistance < 100 and distance > 500) ) {
-      stopCar();
-      for (int i = 10; i <= 170; i = i + 5) {
-       distance = read_sensor();
-        servoSenor.write(i);
-        distance = read_sensor();
-        if (distance > best_distance) {
-          grad = i;
-          best_distance = distance;
-        }
-      }
-    }
-    if (grad < 90) {
-      turn_left();
-    }
-    else if (grad > 90) {
-      turn_right();
-    }
-    else {
-      forward();
-      lastDistance = distance;
-    }
+bool object(int grad) {
+  servoSenor.write(grad);
+  distance = read_sensor();
+  if (distance <= thresHold) {
+    return true;
+  }
+  return false;
 }
 
-  for (int i = 130; i >= 60; i = i - 5) {
-    int grad = 0;
-    servoSenor.write(i);
-    delay(25);
-    distance = read_sensor();
-    distance = read_sensor();
-    if (distance < 50 or (lastDistance < 100 and distance > 500) ) {
-      stopCar();
-      for (int i = 170; i >= 170; i = i - 5) {
-        distance = read_sensor();
-        servoSenor.write(i);
-        distance = read_sensor();
-        if (distance > best_distance) {
-          grad = i;
-          best_distance = distance;
+bool objectCurrent() {
+  distance = read_sensor();
+  Serial.println(distance <= thresHold);
+  if (distance <= thresHold) {
+    return true;
+  }
+  return false;
+}
+
+int findBestSolution (int start, int limit, int changer, int delayTime, bool downwards) {
+  distance = read_sensor();
+  int besteGRAD = 0;
+  int besteDISTANCE = 0;
+
+  if (downwards) {
+    for (int i = start; i >= limit; i += changer) {
+      // Gjør at ting ser bedre ut ved å ikke ha delay på den første runden, det gjør at motoren ikke stopper men bare fortsetter
+      if (i != start) {
+        delay(delayTime);
+      }
+      if (not object(i)) {
+        if (besteDISTANCE < read_sensor()) {
+          besteDISTANCE = read_sensor();
+          besteGRAD = i;
+          Serial.println(besteGRAD);
+          Serial.println(besteDISTANCE);
         }
+
       }
     }
-    if (grad < 90) {
-      turn_left();
+  } else {
+    for (int i = start; i <= limit; i += changer) {
+      if (i != start) {
+        delay(delayTime);
+      }
+      if (not object(i)) {
+        if (besteDISTANCE < read_sensor()) {
+          besteDISTANCE = read_sensor();
+          besteGRAD = i;
+          Serial.println(besteGRAD);
+          Serial.println(besteDISTANCE);
+        }
+
+      }
     }
-    else if (grad > 90) {
-      turn_right();
-    }
-    else {
-      forward();
-      lastDistance = distance;
-    }
+  }
+  return besteGRAD;
+}
+void loop() {
+  // https://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
+  int delayOnLoops = 150;
+  if (object(90)) {
+    stopCar();
+    int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
+    turnDegrees(solution);
+  } else {
+    Serial.println(false);
+    forward();
   }
 
 }
