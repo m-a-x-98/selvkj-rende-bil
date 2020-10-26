@@ -15,10 +15,11 @@ long duration; // variable for the duration of sound wave travel
 int distance; // variable for the distance measurement
 int lastDistance;
 
+int thresHold = 25;
+
 void setup() {
   servoSenor.attach(5);
   servoSenor.write(0);
-  Serial.print("Hello");
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
   pinMode(in_A_1, OUTPUT);
@@ -29,11 +30,12 @@ void setup() {
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
 
-  analogWrite(enA, 1023);
-  analogWrite(enB, 1023);
+  analogWrite(enA, 225);
+  analogWrite(enB, 225);
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
   pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
   Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
+  Serial.println("Hello, running: V.0.93");
   Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
   Serial.println("with Arduino UNO R3");
 }
@@ -113,10 +115,10 @@ void turnDegrees(int degree) {
   servoSenor.write(degree);
   Serial.println(degree);
 
-  if (degree > 90){
-    turn_left(degree *10);
-  }else{
-    turn_right(degree * 50);
+  if (degree > 90) {
+    turn_left((90 + degree) * 3.3);
+  } else {
+    turn_right((90 - degree) * 3.3);
   }
   // TODO
 }
@@ -144,16 +146,16 @@ int read_sensor() {
 bool object(int grad) {
   servoSenor.write(grad);
   distance = read_sensor();
-  if (distance <= 50) {
+  if (distance <= thresHold) {
     return true;
   }
   return false;
 }
 
-bool objectCurrent(){
+bool objectCurrent() {
   distance = read_sensor();
-  Serial.println(distance <= 50);
-  if (distance <= 50){
+  Serial.println(distance <= thresHold);
+  if (distance <= thresHold) {
     return true;
   }
   return false;
@@ -171,7 +173,7 @@ int findBestSolution (int start, int limit, int changer, int delayTime, bool dow
         delay(delayTime);
       }
       if (not object(i)) {
-        if (besteDISTANCE < read_sensor()){
+        if (besteDISTANCE < read_sensor()) {
           besteDISTANCE = read_sensor();
           besteGRAD = i;
           Serial.println(besteGRAD);
@@ -186,7 +188,7 @@ int findBestSolution (int start, int limit, int changer, int delayTime, bool dow
         delay(delayTime);
       }
       if (not object(i)) {
-        if (besteDISTANCE < read_sensor()){
+        if (besteDISTANCE < read_sensor()) {
           besteDISTANCE = read_sensor();
           besteGRAD = i;
           Serial.println(besteGRAD);
@@ -200,12 +202,12 @@ int findBestSolution (int start, int limit, int changer, int delayTime, bool dow
 }
 void loop() {
   // https://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
-  int delayOnLoops = 125;
-  if (object(90)){
+  int delayOnLoops = 150;
+  if (object(90)) {
     stopCar();
-      int solution = findBestSolution(60, 130, 5, delayOnLoops, false);
-        turnDegrees(solution);
-  }else{
+    int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
+    turnDegrees(solution);
+  } else {
     Serial.println(false);
     forward();
   }
