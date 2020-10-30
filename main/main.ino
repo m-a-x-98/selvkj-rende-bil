@@ -200,10 +200,22 @@ int findBestSolution (int start, int limit, int changer, int delayTime, bool dow
   }
   return besteGRAD;
 }
+int andre_grad;
+int i = 0;
+bool object(int grad, int andre_grad) {
+  for (int i = grad; i <= andre_grad; i += 1){
+    servoSenor.write(i);
+  }
+  distance = read_sensor();
+  if (distance <= thresHold) {
+    return true;
+  }
+  return false;
+}
 void loop() {
   // https://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
   int delayOnLoops = 150;
-  if (object(90)) {
+  if (object(80, 100)) {
     stopCar();
     int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
     turnDegrees(solution);
