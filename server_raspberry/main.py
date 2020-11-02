@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask import request
 import socket
 import gpiozero
@@ -8,25 +9,25 @@ local_ip = socket.gethostbyname(hostname)
 print(local_ip)
 
 app = Flask(__name__)
-
+CORS(app=app)
 
 @app.route("/verify", methods=["GET"])
 def verify():
-    return jsonify({"ip": request.remote_addr, "status": 200})
+    return jsonify({"ip ": request.remote_addr, "status ": 200}), 200
 
 
 @app.route("/drive/right", methods=["GET"])
 def drive_right():
     try:
         print("went right")
-        return jsonify({"status": 200})
+        return jsonify({"status ": 200}), 200
     except:
-        return jsonify({"status": 500})
+        return jsonify({"status ": 500}), 500
 
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return jsonify({"error": str(error), "status": 404})
+    return jsonify({"error ": str(error), "status ": 404}), 404
 
 
 if __name__ == "__main__":
