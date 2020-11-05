@@ -82,9 +82,10 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialButton(
               onPressed: () async {
                 bool verified;
-
+                print("1");
                 final response =
                     await http.get("http://" + _text.text + "/verify");
+                print("2");
 
                 print(response.body);
 
@@ -94,8 +95,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
                 setState(() {
                   if (verified) {
+                    print("object");
                     _validate = true;
                   } else {
+                    print("false");
                     _validate = false;
                   }
                 });

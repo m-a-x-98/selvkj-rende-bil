@@ -1,0 +1,19 @@
+2020-11-04 21:22:26 => Failed to register pins, likely beacuse the script is not running on a rasperry pi with pins [N/A] 
+2020-11-04 21:22:26 => 
+
+Started server [V.0.7]  [192.168.50.31] 
+2020-11-04 21:23:39 => Verified access [192.168.50.31] 
+2020-11-04 21:24:45 => Verified access [192.168.50.31] 
+2020-11-04 21:25:28 => Verified access [192.168.50.31] 
+2020-11-04 21:34:51 => Failed to register pins, likely beacuse the script is not running on a rasperry pi with pins [N/A] 
+2020-11-04 21:34:51 => 
+
+Started server [V.0.7]  [192.168.50.31] 
+2020-11-04 21:48:26 => Failed to register pins, likely beacuse the script is not running on a rasperry pi with pins [N/A] 
+2020-11-04 21:48:26 => 
+
+Started server [V.0.7]  [192.168.50.31] 
+2020-11-04 21:49:40 => Failed to register pins, likely beacuse the script is not running on a rasperry pi with pins [N/A] 
+2020-11-04 21:49:40 => 
+
+Started server [V.0.7]  [192.168.50.31] 
