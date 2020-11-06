@@ -35,7 +35,7 @@ void setup() {
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
   pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
   Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
-  Serial.println("Hello, running: V.0.93");
+  Serial.println("Hello, running: V.0.95");
   Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
   Serial.println("with Arduino UNO R3");
 }
@@ -202,20 +202,21 @@ int findBestSolution (int start, int limit, int changer, int delayTime, bool dow
 }
 int andre_grad;
 int i = 0;
-bool object(int grad, int andre_grad) {
-  for (int i = grad; i <= andre_grad; i += 1){
+bool object_move(int grad, int andre_grad) {
+  for (int i = grad; i <= andre_grad; i += 10){
     servoSenor.write(i);
-  }
-  distance = read_sensor();
-  if (distance <= thresHold) {
-    return true;
+    distance = read_sensor();
+    if (distance <= thresHold) {
+      return true;
+    }
+    delay(200);
   }
   return false;
 }
 void loop() {
   // https://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
   int delayOnLoops = 150;
-  if (object(80, 100)) {
+  if (object_move(70, 110)) {
     stopCar();
     int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
     turnDegrees(solution);
