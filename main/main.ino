@@ -41,9 +41,9 @@ void setup()
   analogWrite(enA, 225);
   analogWrite(enB, 225);
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
-  pinMode(echoPin, INPUT);  // Sets the echoPin as an INPUT
-  Serial.begin(9600);       // // Serial Communication is starting with 9600 of baudrate speed
-  Serial.println("Hello, running: V.0.93");
+  pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+  Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
+  Serial.println("Hello, running: V.0.95");
   Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
   Serial.println("with Arduino UNO R3");
 }

@@ -73,5 +73,5 @@ def page_not_found(error):
 
 if __name__ == "__main__":
     write_log("\n" + "\n" + "Started server [V.0.7]. If the ip following is not a 192.168 adress, consider checking ifconfig wlan0", aip=local_ip)
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
     pass
