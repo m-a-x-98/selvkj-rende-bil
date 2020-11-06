@@ -1,4 +1,7 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -9,17 +12,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Raspberry PI kontrolert bil',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Raspberry PI kontrolert bil'),
@@ -48,6 +42,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    final _text = TextEditingController();
+    bool _validate = false;
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -71,12 +68,41 @@ class _MyHomePageState extends State<MyHomePage> {
             Container(
               width: 500,
               child: TextField(
-                decoration: InputDecoration(hintText: "0.0.0.0"),
+                controller: _text,
+                decoration: InputDecoration(
+                  hintText: "192.168.0.0:5000",
+                  errorText: _validate ? 'IP invalid' : "Valid!",
+                ),
               ),
             ),
-            SizedBox(width: 50, height: 25),
+            SizedBox(
+              width: 50,
+              height: 25,
+            ),
             MaterialButton(
-              onPressed: () => print("Hello world"),
+              onPressed: () async {
+                bool verified;
+                print("1");
+                final response =
+                    await http.get("http://" + _text.text + "/verify");
+                print("2");
+
+                print(response.body);
+
+                if (response.statusCode == 200) {
+                  verified = true;
+                }
+
+                setState(() {
+                  if (verified) {
+                    print("object");
+                    _validate = true;
+                  } else {
+                    print("false");
+                    _validate = false;
+                  }
+                });
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(
                   15,
