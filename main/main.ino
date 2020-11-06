@@ -2,6 +2,9 @@
 
 Servo servoSenor;
 
+
+int rasp_1 = 4;
+int rasp_1_state; 
 // Motor a
 int enA = 13;
 int in_A_1 = 12;
@@ -30,6 +33,7 @@ void setup()
   pinMode(in_A_2, OUTPUT);
   pinMode(in_B_3, OUTPUT);
   pinMode(in_B_4, OUTPUT);
+  pinMode(rasp_1, INPUT);
 
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
@@ -246,16 +250,27 @@ bool object(int grad, int andre_grad)
 }
 void loop()
 {
-  int delayOnLoops = 150;
-  if (object(80, 100))
-  {
-    stopCar();
-    int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
-    turnDegrees(solution);
-  }
-  else
-  {
-    Serial.println(false);
-    forward();
+  rasp_1_state = digitalRead(rasp_1);
+  // Show the state of pushbutton on serial monitor
+  Serial.println(rasp_1_state);
+  // check if the pushbutton is pressed.
+  // if it is, the buttonState is HIGH:
+  if (rasp_1_state == HIGH) {
+    int delayOnLoops = 150;
+    if (object(80, 100))
+    {
+      stopCar();
+      int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
+      turnDegrees(solution);
+    }
+    else
+    {
+      Serial.println(false);
+      forward();
+    }
+  } 
+  else {
+
   }
 }
+
