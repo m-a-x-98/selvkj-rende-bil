@@ -4,7 +4,7 @@ Servo servoSenor;
 
 
 int rasp_1 = 4;
-int rasp_1_state; 
+int rasp_1_state;
 // Motor a
 int enA = 13;
 int in_A_1 = 12;
@@ -252,7 +252,7 @@ void loop()
 {
   rasp_1_state = digitalRead(rasp_1);
   // Show the state of pushbutton on serial monitor
-  Serial.println(rasp_1_state);
+  Serial.println(digitalRead(rasp_1));
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
   if (rasp_1_state == HIGH) {
@@ -268,9 +268,8 @@ void loop()
       Serial.println(false);
       forward();
     }
-  } 
+  }
   else {
 
   }
 }
-
