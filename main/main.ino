@@ -1,10 +1,12 @@
+//henter biblioteket "servo.h"
 #include <Servo.h>
 
 Servo servoSenor;
 
-
+//rasberrypi input
 int rasp_1 = 4;
 int rasp_1_state;
+
 // Motor a
 int enA = 13;
 int in_A_1 = 12;
@@ -18,11 +20,12 @@ int in_B_4 = 8;
 // Sensor
 int trigPin = 6;
 int echoPin = 7;
-long duration; // variable for the duration of sound wave travel
-int distance;  // variable for the distance measurement
+long duration; 
+int distance;  
 
 int thresHold = 25;
 
+//bestemmer hva de ulike pins'ene gjør 
 void setup()
 {
   servoSenor.attach(5);
@@ -34,19 +37,18 @@ void setup()
   pinMode(in_B_3, OUTPUT);
   pinMode(in_B_4, OUTPUT);
   pinMode(rasp_1, INPUT);
-
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
-
   analogWrite(enA, 225);
   analogWrite(enB, 225);
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
-  pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
-  Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
+  pinMode(trigPin, OUTPUT); 
+  pinMode(echoPin, INPUT); 
+  Serial.begin(9600); 
   Serial.println("Hello, running: V.0.95");
-  Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
+  Serial.println("Ultrasonic Sensor HC-SR04 Test"); 
   Serial.println("with Arduino UNO R3");
 }
+//svinger til venstre
 void turn_left(int forHowLong)
 {
   digitalWrite(in_A_1, HIGH);
@@ -56,6 +58,7 @@ void turn_left(int forHowLong)
   delay(forHowLong);
   stopCar();
 }
+//svinger til høyre
 void turn_right(int forHowLong)
 {
   digitalWrite(in_A_1, LOW);
@@ -65,6 +68,7 @@ void turn_right(int forHowLong)
   delay(forHowLong);
   stopCar();
 }
+//kjører rett frem
 void forward()
 {
   digitalWrite(in_A_1, LOW);
@@ -72,7 +76,7 @@ void forward()
   digitalWrite(in_B_3, HIGH);
   digitalWrite(in_B_4, LOW);
 }
-
+//kjører bakover/rygger
 void backward()
 {
   digitalWrite(in_A_1, HIGH);
@@ -80,7 +84,7 @@ void backward()
   digitalWrite(in_B_3, LOW);
   digitalWrite(in_B_4, HIGH);
 }
-
+//stopper bilen helt
 void stopCar()
 {
   digitalWrite(in_A_1, LOW);
@@ -124,12 +128,12 @@ void breakdance()
     i += 1;
   }
 }
-
+//får servoen til å bevege seg og får sensoren til å lese avsstanden
 void turnDegrees(int degree)
 {
   servoSenor.write(degree);
   Serial.println(degree);
-
+  //svinger bilen til ditt hvor det er lengst avstand til en hindring 
   if (degree > 90)
   {
     turn_left((90 + degree) * 3.3);
@@ -138,30 +142,25 @@ void turnDegrees(int degree)
   {
     turn_right((90 - degree) * 3.3);
   }
-  // TODO
 }
+//leser av sensoren
 int read_sensor()
 {
   digitalWrite(4, HIGH);
   digitalWrite(5, LOW);
-  // Clears the trigPin condition
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
-  // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(1);
   digitalWrite(trigPin, LOW);
-  // Reads the echoPin, returns the sound wave travel time in microseconds
   duration = pulseIn(echoPin, HIGH);
-  // Calculating the distance
-  distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
-  // Displays the distance on the Serial Monitor
+  distance = duration * 0.034 / 2; 
   Serial.print("Distance: ");
   Serial.print(distance);
   Serial.println(" cm");
   return distance;
 }
-
+//får bilen til å stoppe hvis sensoren oppdager noe forran seg
 bool object(int grad)
 {
   servoSenor.write(grad);
@@ -183,7 +182,7 @@ bool objectCurrent()
   }
   return false;
 }
-
+//finner den graden hvor det er lengst til nærmeste hindring og returnere graden (finner beste løsning)
 int findBestSolution(int start, int limit, int changer, int delayTime, bool downwards)
 {
   distance = read_sensor();
@@ -233,9 +232,20 @@ int findBestSolution(int start, int limit, int changer, int delayTime, bool down
   }
   return besteGRAD;
 }
+bool object_while_moving(int grad, int andre_grad) {
+  for (int i = grad; i <= andre_grad; i += 1){
+    servoSenor.write(i);
+  }
+  distance = read_sensor();
+  if (distance <= thresHold) {
+    return true;
+  }
+  return false;
+}
+//ser etter hindringer mens bilen kjører
 int andre_grad;
 int i = 0;
-bool object(int grad, int andre_grad)
+bool object_while_moving(int grad, int andre_grad)
 {
   for (int i = grad; i <= andre_grad; i += 1)
   {
@@ -248,13 +258,11 @@ bool object(int grad, int andre_grad)
   }
   return false;
 }
+//får sensoren til å gå frem å tilbake mens den kjører, og bilen til å stoppe hvis sensoren ser noe
 void loop()
 {
   rasp_1_state = digitalRead(rasp_1);
-  // Show the state of pushbutton on serial monitor
   Serial.println(digitalRead(rasp_1));
-  // check if the pushbutton is pressed.
-  // if it is, the buttonState is HIGH:
   if (rasp_1_state == HIGH) {
     int delayOnLoops = 150;
     if (object(80, 100))
