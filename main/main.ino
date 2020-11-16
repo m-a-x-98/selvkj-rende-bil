@@ -44,9 +44,7 @@ void setup()
   pinMode(trigPin, OUTPUT); 
   pinMode(echoPin, INPUT); 
   Serial.begin(9600); 
-  Serial.println("Hello, running: V.0.95");
-  Serial.println("Ultrasonic Sensor HC-SR04 Test"); 
-  Serial.println("with Arduino UNO R3");
+  Serial.println("Hello, running: V.0.96");
 }
 //svinger til venstre
 void turn_left(int forHowLong)
@@ -233,6 +231,7 @@ int findBestSolution(int start, int limit, int changer, int delayTime, bool down
   return besteGRAD;
 }
 bool object_while_moving(int grad, int andre_grad) {
+  delay(100);
   for (int i = grad; i <= andre_grad; i += 1){
     servoSenor.write(i);
   }
@@ -242,42 +241,27 @@ bool object_while_moving(int grad, int andre_grad) {
   }
   return false;
 }
-//ser etter hindringer mens bilen kjører
-int andre_grad;
-int i = 0;
-bool object_while_moving(int grad, int andre_grad)
-{
-  for (int i = grad; i <= andre_grad; i += 1)
-  {
-    servoSenor.write(i);
-  }
-  distance = read_sensor();
-  if (distance <= thresHold)
-  {
-    return true;
-  }
-  return false;
-}
+
 //får sensoren til å gå frem å tilbake mens den kjører, og bilen til å stoppe hvis sensoren ser noe
 void loop()
 {
-  rasp_1_state = digitalRead(rasp_1);
-  Serial.println(digitalRead(rasp_1));
-  if (rasp_1_state == HIGH) {
-    int delayOnLoops = 150;
-    if (object(80, 100))
-    {
-      stopCar();
-      int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
+  bool objectAhead;
+  int i = 10;
+  while(!objectAhead){
+    if (i >= 150){
+      if (object(i)){
+            objectAhead = true;
+      }
+    }else{
+      i = 0;
+    }
+    i += 1;
+    Serial.println("i");
+    Serial.println(i);
+    forward();
+  }
+  stopCar();
+  int delayOnLoops = 150;
+        int solution = findBestSolution(10, 170, 10, delayOnLoops, false);
       turnDegrees(solution);
-    }
-    else
-    {
-      Serial.println(false);
-      forward();
-    }
-  }
-  else {
-
-  }
 }
